@@ -16,6 +16,54 @@
                 </form>			
 		{{url}}
 
+		<div>
+			<table style="border: 1px;" id="dynamicTable">
+			<table border="1">
+			<thead>
+			<tr>			
+			<th>번호</th>
+			<th>url</th>
+			<th>단어 수</th>
+			<th>처리 시간</th>
+			<th>단어 분석 버튼</th>
+			<th>유사도 분석 버튼</th>
+			</tr>
+			</thead>
+
+			<tbody>
+				<script language="javascript">
+					function table(_url){
+						console.log(_url);
+					}
+
+					var a = '{{ url[0] }}';
+					document.write("<tr>");
+					for(i=1;i<=6;i++)
+					{					
+					document.write("<td>");
+					document.write(a[0]);
+					document.write("</td>");
+					}
+					document.write("</tr>");
+
+
+				</script>
+			</tbody>
+			</table>
+
+			<script>
+				
+
+
+
+
+
+			</script>
+
+
+
+		</div>
+
 	</body>
 </html>
 
