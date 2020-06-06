@@ -1,0 +1,3 @@
+http://rya.apache.org/
+http://impala.apache.org/
+http://hive.apache.org/
