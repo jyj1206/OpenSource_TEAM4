@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
@@ -9,13 +10,32 @@
                 	Enter the url <input name="name" type="text"><br/>
                		 <button type="submit"> Submit </button>
         	</form>
-
 		<form method="Post" action="/urltext"  enctype = "multipart/form-data">
                 	<input type="file" name="file">
                 	<button type="submit"> Submit </button>
                 </form>			
-		{{url}}
+		<h3>
+                 	<script lanagage="javascript">
+                                var url_num='{{url_num}}';
+                                if(url_num==1){
+                                var key='{{status}}';
+                                        if(key==1)
+                                                document.write("성공");
+                                        else if(key==-1)
+                                                document.write("실패");
+                                        else
+                                                document.write("중복");
+                                }
+				if(url_num>1){
+				var success='{{success}}';
+				var fail='{{fail}}';
+				var same='{{same}}';
+				document.write('총 url 수 : ', url_num,' 성공 : ', success , ' 실패 : ',fail, ' 중복 : ',same,'<br/>');
+				}
+                        </script>
+                </h3>
 
+		</h3>
 		<div>
 			<table style="border: 1px;" id="dynamicTable">
 			<table border="1">
@@ -25,26 +45,44 @@
 			<th>url</th>
 			<th>단어 수</th>
 			<th>처리 시간</th>
-			<th>단어 분석 버튼</th>
-			<th>유사도 분석 버튼</th>
 			</tr>
 			</thead>
 
 			<tbody>
 				<script language="javascript">
-					function table(_url){
-						console.log(_url);
-					}
 
-					var a = '{{ url[0] }}';
+					var c = '{{ count }}';
+					
+					var _url = {{url_list|tojson}};
+					var word = {{url_totalword|tojson}};
+							
+					
+
+					for(i=0;i<c;i++)
+	    				{
+
+
 					document.write("<tr>");
-					for(i=1;i<=6;i++)
-					{					
+					
 					document.write("<td>");
-					document.write(a[0]);
+                                        document.write(i+1);
+                                        document.write("</td>");
+
+
+					document.write("<td>");
+					document.write(_url[i]);
 					document.write("</td>");
-					}
+					
+					document.write("<td>");
+                                        document.write(word[i]);
+                                        document.write("</td>");
+
+					document.write("<td>");
+                                        document.write(c);
+                                        document.write("</td>");
+
 					document.write("</tr>");
+					}
 
 
 				</script>
@@ -57,13 +95,12 @@
 
 
 
-
 			</script>
-
-
-
+			<input type="button" value="팝업창 호출" onclick="popup();" />
+			
 		</div>
 
 	</body>
 </html>
+
 
