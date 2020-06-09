@@ -21,9 +21,7 @@ es_host="127.0.0.1"
 es_port="9200"
 es=Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
 e={
-    "url":[],
-    "num_of_word":[],
-    "Processing_time":[]
+    "url":[]
 }
 
 count=0
@@ -65,8 +63,8 @@ def url_add(url):
                 else:
                      lines[count]=lines[count] + ' ' + word.lower()
                 wordcount+=1
-            count+=1
-        e["num_of_word"].append(wordcount)
+        e[count]={'url':url,'Total_word':wordcount,'Lines':lines[count],'Process_Time' : 0}
+        count+=1
         return 1
     except:
         return -1
@@ -75,7 +73,7 @@ def url_add(url):
 def url_analysis():
     global es;
     res=es.index(index='web',doc_type='word',id=1,body=e)
-    return render_template('info.html',url_num=url_num,status=status,success=success,fail=fail,same=same,url_list=e["url"],url_totalword=e["num_of_word"],count=count)
+    return render_template('info.html',url_num=url_num,status=status,success=success,fail=fail,same=same,count=count,url_info=e)
 
 @app.route('/url',methods=['POST'])
 def url_input():
