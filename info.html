@@ -2,6 +2,25 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
+	<head>
+		<script>
+			function popup1(_id){
+				alert(_id);
+
+				//var url = "home.html";
+				//var name = "popup";
+				//var option = "width = 500, height = 500, top = 100, left = 200, location = no"
+				//window.open(url, name, option);
+			}
+			function popup2(_id){
+                                alert(_id);
+				//var url = "similar_popup.html";
+                                //var name = "popup";
+                                //var option = "width = 500, height = 500, top = 100, left = 200, location = no"
+                                window.open(url, name, option);
+                        }
+		</script>
+	</head>
 	<body>
 	
 		<h1> Analysis url </h1>
@@ -44,6 +63,8 @@
 			<th>url</th>
 			<th>단어 수</th>
 			<th>처리 시간</th>
+			<th>button</th>
+			<th>button</th>
 			</tr>
 			</thead>
 
@@ -73,7 +94,15 @@
 					document.write("<td>");
                                         document.write(info2['Process_Time']);
                                         document.write("</td>");
-	
+
+					document.write("<td>");
+					document.write("<form><input type='button' id='word"+i+"' value='click' Onclick='popup1(this.id)' ></form>");
+                                        document.write("</td>");
+
+					document.write("<td>");
+                                        document.write("<form><input type='button' id='sim"+i+"' value='click' Onclick='popup2(this.id)' ></form>");
+                                        document.write("</td>");
+
 	    				document.write("</tr>");
 					
 					}
