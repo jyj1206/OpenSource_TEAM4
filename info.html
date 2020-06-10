@@ -35,7 +35,6 @@
                         </script>
                 </h3>
 
-		</h3>
 		<div>
 			<table style="border: 1px;" id="dynamicTable">
 			<table border="1">
@@ -52,54 +51,38 @@
 				<script language="javascript">
 
 					var c = '{{ count }}';
-					
-					var _url = {{url_list|tojson}};
-					var word = {{url_totalword|tojson}};
-							
-					
-
+					var info = {{url_info|tojson}};
 					for(i=0;i<c;i++)
 	    				{
-
-
+					var info2 = info[i];
 					document.write("<tr>");
 					
 					document.write("<td>");
-                                        document.write(i+1);
+                                        document.write(i);
                                         document.write("</td>");
 
 
 					document.write("<td>");
-					document.write(_url[i]);
+					document.write(info2['url']);
 					document.write("</td>");
 					
 					document.write("<td>");
-                                        document.write(word[i]);
+                                        document.write(info2['Total_word']);
                                         document.write("</td>");
 
 					document.write("<td>");
-                                        document.write(c);
+                                        document.write(info2['Process_Time']);
                                         document.write("</td>");
-
-					document.write("</tr>");
+	
+	    				document.write("</tr>");
+					
 					}
 
-
+					
 				</script>
 			</tbody>
-			</table>
-
-			<script>
-				
-
-
-
-
-			</script>
-			<input type="button" value="팝업창 호출" onclick="popup();" />
-			
+			</table>	
 		</div>
-
 	</body>
 </html>
 
