@@ -14,9 +14,11 @@ from numpy import dot
 from numpy.linalg import norm
 from nltk import word_tokenize
 import math
+import time
 
 app = Flask(__name__)
 
+#elasticsearch
 es_host="127.0.0.1"
 es_port="9200"
 es=Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
@@ -24,8 +26,11 @@ e={
     "url":[]
 }
 
+#data
 count=0
 lines=[]
+index=[]
+
 # status
 url_num=0
 status=0
@@ -37,34 +42,56 @@ def cleanText(line):
     text = re.sub('[©®™¶\”\“{\}\-=+,#/\;?^$:.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]', ' ', line)
     return text
 
+#analysis
 word_d = {}
 sent_list = []
 
 def cosine_similarity(x,c):
+    start_time=time.time()
     global count
-    sent_list=[]
-    word_d={}
-    for i in range(0,count):
-        process_new_sentence(x[i]['lines'])
-        x[i]['vector']=make_vector(i)
-    v1=x[c]['vector']
+    j=0
+    x[c]['top3 cossimil']={}
+    temp_cossimil={}
+    v1=make_vector(c)
     for i in range(0,count):
         if(c==i):
             continue
-        v2=x[i]['vector']
+        v2=make_vector(i)
         dotpro= numpy.dot(v1,v2)
         cossimil = dotpro/(norm(v1)*norm(v2))
-        x[i]['cossimil'][i]=cossimill
+        temp_cossimil[i]=cossimil
+        j+=1
+    sorted_temp=sorted(temp_cossimil.items(),key=lambda x:x[1],reverse=True)
+    if(j>=3):
+        j=3
+    for (n1,n2) in sorted_temp:
+        if(j==0):
+            break
+        x[c]['top3 cossimil'][x[n1]['url']]=n2
+        j-=1;
+    end_time=time.time()
+    x[c]['Process_Time']=end_time-start_time
 
 def tf_idf(x,c):
-    sent_list=[]
-    word_d={}
-    for i in range(0,count):
-        process_new_sentence(x[i]['lines'])
+    start_time=time.time()
+    x[c]['top10 tf idf']={}
+    j=0
+    temp_tf_idf={}
     idf_d = compute_idf()
     tf_d = compute_tf(sent_list[c])
     for word,tfval in tf_d.items():
-        x[c]['tf_idf'][word]=tfval*idf_d[word]
+        temp_tf_idf[word]=tfval*idf_d[word]
+        j+=1
+    sorted_temp=sorted(temp_tf_idf.items(),key=lambda x:x[1],reverse=True)
+    if(j>=10):
+        j=10
+    for (n1,n2) in sorted_temp:
+        if(j==0):
+            break
+        x[c]['top10 tf idf'][n1]=n2
+        j-=1
+    end_time=time.time()
+    x[c]['Process_Time']=end_time-start_time
 
 def process_new_sentence(s):
     sent_list.append(s)
@@ -97,7 +124,6 @@ def compute_tf(s):
             wordcount_d[tok]=0
         wordcount_d[tok] += 1
         bow.add(tok)
-
     tf_d = {}
     for word,count in wordcount_d.items():
         tf_d[word]=count/float(len(bow))
@@ -146,7 +172,8 @@ def url_add(url):
                 else:
                      lines[count]=lines[count] + ' ' + word.lower()
                 wordcount+=1
-        e[count]={'url':url,'Total_word':wordcount,'Lines':lines[count],'Process_Time' : 0,'cosimil':{}}
+        e[count]={'url':url,'Total_word':wordcount,'Process_Time' : 0,'top3 cossimil':{} ,'top10 tf idf': {} }
+        process_new_sentence(lines[count])
         count+=1
         return 1
     except:
@@ -186,6 +213,20 @@ def url_input2():
         else:
             same+=1
         url_num+=1
+    return redirect(url_for('url_analysis'))
+
+@app.route('/cosinesimil',methods=['POST'])
+def analysis1():
+    global index
+    index=request.form['input']
+    cosine_similarity(e,int(index[1:len(index)]))
+    return redirect(url_for('url_analysis'))
+
+@app.route('/tf-idf',methods=['POST'])
+def analysis2():
+    global index
+    index=request.form['input']
+    tf_idf(e,int(index[1:len(index)]))
     return redirect(url_for('url_analysis'))
 
 if __name__ == '__main__':
