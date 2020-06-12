@@ -1,3 +1,10 @@
-http://rya.apache.org/
 http://impala.apache.org/
-http://hive.apache.org/
+http://attic.apache.org/
+http://any23.apache.org/
+https://lucene.apache.org/
+http://whimsical.apache.org/
+https://jena.apache.org/
+http://xerces.apache.org/
+http://trafficcontrol.apache.org/
+http://nifi.apache.org/
+http://mina.apache.org/

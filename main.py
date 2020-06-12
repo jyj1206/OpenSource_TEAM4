@@ -30,6 +30,7 @@ e={
 count=0
 lines=[]
 index=[]
+key=False
 
 # status
 url_num=0
@@ -181,9 +182,14 @@ def url_add(url):
 
 @app.route('/')
 def url_analysis():
-    global es;
+    global index
+    global key
+    if(key==False):
+        index=[]
+    if(key==True):
+        key=False
     res=es.index(index='web',doc_type='word',id=1,body=e)
-    return render_template('info.html',url_num=url_num,status=status,success=success,fail=fail,same=same,count=count,url_info=e)
+    return render_template('info.html',url_num=url_num,status=status,success=success,fail=fail,same=same,count=count,url_info=e,index=index)
 
 @app.route('/url',methods=['POST'])
 def url_input():
@@ -195,29 +201,34 @@ def url_input():
 
 @app.route('/urltext',methods=['POST'])
 def url_input2():
-    global url_num, success, fail, same
-    url_num=0
-    success=0
-    fail=0
-    same=0
-    f=request.files['file']
-    fp=open(f.filename,'r')
-    urls=fp.readlines()
-    for url in urls:
-        url=url.replace('\n','')
-        temp=url_add(url)
-        if(temp==1):
-            success+=1
-        elif(temp==-1):
-            fail+=1
-        else:
-            same+=1
-        url_num+=1
-    return redirect(url_for('url_analysis'))
+    try:
+        global url_num, success, fail, same
+        url_num=0
+        success=0
+        fail=0
+        same=0
+        f=request.files['file']
+        fp=open(f.filename,'r')
+        urls=fp.readlines()
+        for url in urls:
+            url=url.replace('\n','')
+            temp=url_add(url)
+            if(temp==1):
+                success+=1
+            elif(temp==-1):
+                fail+=1
+            else:
+                same+=1
+            url_num+=1
+        return redirect(url_for('url_analysis'))
+    except:
+        return redirect(url_for('url_analysis'))
 
-@app.route('/cosinesimil',methods=['POST'])
+@app.route('/cossimil',methods=['POST'])
 def analysis1():
     global index
+    global key
+    key=True
     index=request.form['input']
     cosine_similarity(e,int(index[1:len(index)]))
     return redirect(url_for('url_analysis'))
@@ -225,6 +236,8 @@ def analysis1():
 @app.route('/tf-idf',methods=['POST'])
 def analysis2():
     global index
+    global key
+    key=True
     index=request.form['input']
     tf_idf(e,int(index[1:len(index)]))
     return redirect(url_for('url_analysis'))
