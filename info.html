@@ -1,24 +1,51 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 
 <html>
 	<head>
 		<script>
-			function popup1(_id){
-				alert(_id);
+			var wnd;
 
-				//var url = "home.html";
-				//var name = "popup";
-				//var option = "width = 500, height = 500, top = 100, left = 200, location = no"
-				//window.open(url, name, option);
+			function popup1(_id){
+				if(wnd){
+					wnd.close();
+				}
+				 
+                                var form = document.createElement("form");
+                                form.setAttribute("method", "Post");
+                                form.setAttribute("action", "/cossimil");
+                                
+                                var hiddenField = document.createElement("input");
+                                hiddenField.setAttribute("type", "hidden");
+                                hiddenField.setAttribute("name", "input");
+                                hiddenField.setAttribute("value", _id);
+                                form.appendChild(hiddenField);
+                                
+                                document.body.appendChild(form);
+                                form.submit();
+
+                       }
+                       function popup2(_id){
+			       if(wnd){
+                                        wnd.close();
+                                }
+
+
+
+                                var form = document.createElement("form");
+                                form.setAttribute("method", "Post");
+                                form.setAttribute("action", "/tf-idf");
+
+                                var hiddenField = document.createElement("input");
+                                hiddenField.setAttribute("type", "hidden");
+                                hiddenField.setAttribute("name", "input");
+                                hiddenField.setAttribute("value", _id);
+                                form.appendChild(hiddenField);
+
+                                document.body.appendChild(form);
+                                form.submit();
 			}
-			function popup2(_id){
-                                alert(_id);
-				//var url = "similar_popup.html";
-                                //var name = "popup";
-                                //var option = "width = 500, height = 500, top = 100, left = 200, location = no"
-                                window.open(url, name, option);
-                        }
 		</script>
 	</head>
 	<body>
@@ -63,13 +90,13 @@
 			<th>url</th>
 			<th>단어 수</th>
 			<th>처리 시간</th>
-			<th>button</th>
-			<th>button</th>
+			<th>유사도 분석</th>
+			<th>단어분석</th>
 			</tr>
 			</thead>
 
 			<tbody>
-				<script language="javascript">
+				<script>
 
 					var c = '{{ count }}';
 					var info = {{url_info|tojson}};
@@ -92,15 +119,15 @@
                                         document.write("</td>");
 
 					document.write("<td>");
-                                        document.write(info2['Process_Time']);
+                                        document.write(info2['Process_Time'].toFixed(3));
                                         document.write("</td>");
 
 					document.write("<td>");
-					document.write("<form><input type='button' id='word"+i+"' value='click' Onclick='popup1(this.id)' ></form>");
+					document.write("<form><input type='button' id='s"+i+"' value='click' onClick='popup1(this.id)' ></form>");
                                         document.write("</td>");
 
 					document.write("<td>");
-                                        document.write("<form><input type='button' id='sim"+i+"' value='click' Onclick='popup2(this.id)' ></form>");
+                                        document.write("<form><input type='button' id='w"+i+"' value='click' onClick='popup2(this.id)' ></form>");
                                         document.write("</td>");
 
 	    				document.write("</tr>");
@@ -110,9 +137,39 @@
 					
 				</script>
 			</tbody>
-			</table>	
+			</table>
+			
+			<script>
+				var index={{index|tojson}};
+				if(index[0]=='s'){
+					var cut = index.slice(1, index.length);
+					info2=info[cut];
+					var k=[];
+					var v=[];
+					for(var key in info2['top3 cossimil']){
+						k[k.length]=key;
+						v[v.length]=info2['top3 cossimil'][key]
+					}
+
+					wnd = window.open("","www","width=600, height=400, resizable = no, scrollbars = no");
+					wnd.document.write("<title>cosine_similarity</title>	<body><h3>cosine similarity 기반 현재 url 과 가장 유사한 top3 url 리스트</h3><h4>현재 url: "+info2['url']+"</h4>	<style>table, th, td { border: 1px solid #bcbcbc; } table{ width: 550px; height: 200px; } td{ text-align: center; }</style>	<table><th>순위</th><th>url</th><th>cosine similarity</th>	<tr><td>1</td>	<td>"+k[0]+"</td>	<td>"+v[0].toFixed(5)+"</td></tr>	<tr><td>2</td>   <td>"+k[1]+"</td>       <td>"+v[1].toFixed(5)+"</td></tr>	<tr><td>3</td>   <td>"+k[2]+"</td>       <td>"+v[2].toFixed(5)+"</td></tr></table></body>");
+			
+				}	
+				else if(index[0]=="w"){
+					var cut = index.slice(1, index.length);
+                        		info2=info[cut];
+
+			
+					wnd = window.open("","www","width=400, height=300, resizable = no, scrollbars = no");
+					wnd.document.write("<title>TF-IDF</title><body><h3>TF-IDF 기반 상위 top10 주요 단어 리스트</h3><h4>현재 url: "+info2['url']+"</h4></body>");
+				}
+
+			</script>
+		
 		</div>
 	</body>
 </html>
+
+
 
 
