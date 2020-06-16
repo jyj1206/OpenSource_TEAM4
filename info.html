@@ -46,31 +46,63 @@
                                 document.body.appendChild(form);
                                 form.submit();
 			}
+			function aasort(arr){
+				var tuples = []; 
+				for (var key in arr) 
+					tuples.push([key, arr[key]]); 
+				tuples.sort(function(a, b) { 
+					a = a[1]; b = b[1]; 
+					return a < b ? -1 : (a > b ? 1 : 0); }); 
+				return tuples; 
+			}
 		</script>
+		<style>
+			hr.six{border:none; width: 70%; border:5px double orange;}
+			.s1{
+				display: inline-block;
+            			background-color: burlywood;
+        		}
+        		.s2{
+				display: inline-block;
+            			background-color: cadetblue;
+        		}
+		</style>
 	</head>
 	<body>
-	
-		<h1> Analysis url </h1>
+		<center>
+		<h1>
+			<span style="color:#B8860B">웹페이지</span>
+			<span style="color:#00008B">URL</span>
+			<span style="color:#008B8B">분석 툴</span>
+		</h1>
 		
+
+		<span class='s1'>
 		<form method="POST" action="/url">
-                	Enter the url <input name="name" type="text"><br/>
-               		 <button type="submit"> Submit </button>
-        	</form>
+                        단일 url입력</br><input name="name" type="text">
+                         <button type="submit"> Click </button>
+                </form>
+		</span>
+
+		<span class='s2'>
 		<form method="Post" action="/urltext"  enctype = "multipart/form-data">
-                	<input type="file" name="file">
-                	<button type="submit"> Submit </button>
-                </form>			
+                        url파일 업로드</br><input type="file" name="file">
+                        <button type="submit"> Click </button>
+                </form>
+		</span>
+
 		<h3>
+			크롤링 상태
                  	<script lanagage="javascript">
                                 var url_num='{{url_num}}';
                                 if(url_num==1){
                                 var key='{{status}}';
                                         if(key==1)
-                                                document.write("성공");
+                                                document.write(": 성공");
                                         else if(key==-1)
-                                                document.write("실패");
+                                                document.write(": 실패");
                                         else
-                                                document.write("중복");
+                                                document.write(": 중복");
                                 }
 				if(url_num>1){
 				var success='{{success}}';
@@ -80,10 +112,34 @@
 				}
                         </script>
                 </h3>
+		</center>
+
+			<hr class="six">
+			</br>
 
 		<div>
+
+			<style>
+				table{ 
+					width: 70%;
+					min-width: 700px;
+					margin-left: auto;
+                                        margin-right: auto;
+				}
+
+				thead tr {
+    					background-color: #04B486;
+    					color: #ffffff;
+  				}
+  				tbody tr:nth-child(2n) {
+  					background-color: #CEF6EC;
+				}
+				tbody tr:nth-child(2n+1) {
+					background-color: #CEF6E3;
+				}
+
+			</style>
 			<table style="border: 1px;" id="dynamicTable">
-			<table border="1">
 			<thead>
 			<tr>			
 			<th>번호</th>
@@ -105,30 +161,30 @@
 					var info2 = info[i];
 					document.write("<tr>");
 					
-					document.write("<td>");
-                                        document.write(i);
-                                        document.write("</td>");
 
+					document.write("<td><center>");
+                                        document.write(i);
+					document.write("</center></td>");
 
 					document.write("<td>");
 					document.write(info2['url']);
 					document.write("</td>");
 					
-					document.write("<td>");
+					document.write("<td><center>");
                                         document.write(info2['Total_word']);
-                                        document.write("</td>");
+					document.write("</center></td>");
 
-					document.write("<td>");
+					document.write("<td><center>");
                                         document.write(info2['Process_Time'].toFixed(3));
-                                        document.write("</td>");
+                                        document.write("</center></td>");
 
-					document.write("<td>");
-					document.write("<form><input type='button' id='s"+i+"' value='click' onClick='popup1(this.id)' ></form>");
-                                        document.write("</td>");
+					document.write("<td><center>");
+					document.write("<form><input type='button' id='s"+i+"' value='Click' onClick='popup1(this.id)' ></form>");
+                                        document.write("</center></td>");
 
-					document.write("<td>");
-                                        document.write("<form><input type='button' id='w"+i+"' value='click' onClick='popup2(this.id)' ></form>");
-                                        document.write("</td>");
+					document.write("<td><center>");
+                                        document.write("<form><input type='button' id='w"+i+"' value='Click' onClick='popup2(this.id)' ></form>");
+                                        document.write("</center></td>");
 
 	    				document.write("</tr>");
 					
@@ -142,26 +198,72 @@
 			<script>
 				var index={{index|tojson}};
 				if(index[0]=='s'){
+					var counting=0;
 					var cut = index.slice(1, index.length);
 					info2=info[cut];
 					var k=[];
 					var v=[];
-					for(var key in info2['top3 cossimil']){
-						k[k.length]=key;
-						v[v.length]=info2['top3 cossimil'][key]
+					var ary= [];
+					for (var key in info2['top3 cossimil']) {
+  						ary.push([ key, info2['top3 cossimil'][key] ])
+					}
+					ary.sort(function(kv1, kv2){
+						 return kv2[1] - kv1[1]
+					})
+
+					for(var key in ary){
+						k[k.length]=ary[key][0];
+						v[v.length]=ary[key][1];
+						counting++;
 					}
 
 					wnd = window.open("","www","width=600, height=400, resizable = no, scrollbars = no");
-					wnd.document.write("<title>cosine_similarity</title>	<body><h3>cosine similarity 기반 현재 url 과 가장 유사한 top3 url 리스트</h3><h4>현재 url: "+info2['url']+"</h4>	<style>table, th, td { border: 1px solid #bcbcbc; } table{ width: 550px; height: 200px; } td{ text-align: center; }</style>	<table><th>순위</th><th>url</th><th>cosine similarity</th>	<tr><td>1</td>	<td>"+k[0]+"</td>	<td>"+v[0].toFixed(5)+"</td></tr>	<tr><td>2</td>   <td>"+k[1]+"</td>       <td>"+v[1].toFixed(5)+"</td></tr>	<tr><td>3</td>   <td>"+k[2]+"</td>       <td>"+v[2].toFixed(5)+"</td></tr></table></body>");
-			
-				}	
+
+					if(counting==0){
+						wnd.document.write("<head><title>cosine_similarity</title>      <style>th{background-color:#FFF8DC}</style></head> <body><h3>cosine similarity 기반 현재 url 과 가장 유사한 top3 url 리스트</h3><h4>현재 url: "+info2['url']+"</h4>비교 url이 없습니다...</body>");
+					}
+					else if(counting==1){
+						wnd.document.write("<head><title>cosine_similarity</title>      <style>th{background-color:#FFF8DC}</style></head> <body><h3>cosine similarity 기반 현재 url 과 가장 유사한 top3 url 리스트</h3><h4>현재 url: "+info2['url']+"</h4>        <style>table, th, td { border: 1px solid #bcbcbc; } table{ width: 550px; height: 200px; } td{ text-align: center; }</style>     <table><th>순위</th><th>url</th><th>cosine similarity</th>      <tr><td>1</td>  <td>"+k[0]+"</td>       <td>"+v[0].toFixed(5)+"</td></tr></table></body>");
+					}
+					else if(counting==2){
+						wnd.document.write("<head><title>cosine_similarity</title>      <style>th{background-color:#FFF8DC}</style></head> <body><h3>cosine similarity 기반 현재 url 과 가장 유사한 top3 url 리스트</h3><h4>현재 url: "+info2['url']+"</h4>        <style>table, th, td { border: 1px solid #bcbcbc; } table{ width: 550px; height: 200px; } td{ text-align: center; }</style>     <table><th>순위</th><th>url</th><th>cosine similarity</th>      <tr><td>1</td>  <td>"+k[0]+"</td>       <td>"+v[0].toFixed(5)+"</td></tr>       <tr><td>2</td>   <td>"+k[1]+"</td>       <td>"+v[1].toFixed(5)+"</td></tr></table></body>");
+					}
+					else{
+					wnd.document.write("<head><title>cosine_similarity</title>	<style>th{background-color:#FFF8DC}</style></head>	<body><h3>cosine similarity 기반 현재 url 과 가장 유사한 top3 url 리스트</h3><h4>현재 url: "+info2['url']+"</h4>	<style>table, th, td { border: 1px solid #bcbcbc; } table{ width: 550px; height: 200px; } td{ text-align: center; }</style>	<table><th>순위</th><th>url</th><th>cosine similarity</th>	<tr><td>1</td>	<td>"+k[0]+"</td>	<td>"+v[0].toFixed(5)+"</td></tr>	<tr><td>2</td>   <td>"+k[1]+"</td>       <td>"+v[1].toFixed(5)+"</td></tr>	<tr><td>3</td>   <td>"+k[2]+"</td>       <td>"+v[2].toFixed(5)+"</td></tr></table></body>");
+					}
+				}
+
 				else if(index[0]=="w"){
+					var count = 0;
 					var cut = index.slice(1, index.length);
                         		info2=info[cut];
+					var k=[];
+                                        var v=[];
+                                        var ary= [];
+                                        for (var key in info2['top10 tf idf']) {
+                                                ary.push([ key, info2['top10 tf idf'][key] ])
+                                        }
+                                        ary.sort(function(kv1, kv2){
+                                                 return kv2[1] - kv1[1]
+                                        })
+
+                                        for(var key in ary){
+                                                k[k.length]=ary[key][0];
+                                                v[v.length]=ary[key][1];
+                                                counting++;
+                                        }
+
 
 			
-					wnd = window.open("","www","width=400, height=300, resizable = no, scrollbars = no");
-					wnd.document.write("<title>TF-IDF</title><body><h3>TF-IDF 기반 상위 top10 주요 단어 리스트</h3><h4>현재 url: "+info2['url']+"</h4></body>");
+					wnd = window.open("","www","width=600, height=400, resizable = no, scrollbars = no");
+
+					if(counting<10){
+					wnd.document.write("<head><title>TF-IDF</title>         <style>th{background-color:#FFF8DC}</style></head>         <body><h3>TF-IDF 기반 상위 top10 주요 단어 리스트</h3><h4>현재 url: "+info2['url']+"해당 url의 단어수가 10개 미만입니다...</body>");
+					}
+
+					else{
+					wnd.document.write("<head><title>TF-IDF</title>		<style>th{background-color:#FFF8DC}</style></head>		<body><h3>TF-IDF 기반 상위 top10 주요 단어 리스트</h3><h4>현재 url: "+info2['url']+"</h4>	<style>table, th, td { border: 1px solid #bcbcbc; } table{ width: 550px; height: 200px; } td{ text-align: center; }</style>     <table><th>순위</th><th>단어</th><th>tf-idf</th>      <tr><td>1</td>  <td>"+k[0]+"</td>       <td>"+v[0].toFixed(5)+"</td></tr>       <tr><td>2</td>   <td>"+k[1]+"</td>       <td>"+v[1].toFixed(5)+"</td></tr>      <tr><td>3</td>   <td>"+k[2]+"</td>       <td>"+v[2].toFixed(5)+"</td></tr>      <tr><td>4</td>  <td>"+k[3]+"</td>       <td>"+v[3].toFixed(5)+"</td></tr>       <tr><td>5</td>   <td>"+k[4]+"</td>       <td>"+v[4].toFixed(5)+"</td></tr>      <tr><td>6</td>   <td>"+k[5]+"</td>       <td>"+v[5].toFixed(5)+"</td></tr>      <tr><td>7</td>  <td>"+k[6]+"</td>       <td>"+v[6].toFixed(5)+"</td></tr>       <tr><td>8</td>   <td>"+k[7]+"</td>       <td>"+v[7].toFixed(5)+"</td></tr>      <tr><td>9</td>   <td>"+k[8]+"</td>       <td>"+v[8].toFixed(5)+"</td></tr>      <tr><td>10</td>   <td>"+k[9]+"</td>       <td>"+v[9].toFixed(5)+"</td></tr></table>	</body>");
+					}	
 				}
 
 			</script>
