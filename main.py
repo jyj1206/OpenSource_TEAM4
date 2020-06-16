@@ -15,6 +15,8 @@ from numpy.linalg import norm
 from nltk import word_tokenize
 import math
 import time
+import nltk
+nltk.download('punkt')
 
 app = Flask(__name__)
 
